@@ -13,3 +13,4 @@ namespace GayaProject.Interfaces
         Task<int> GetCountExuteByMonth(int idOperator);
     }
 }
+

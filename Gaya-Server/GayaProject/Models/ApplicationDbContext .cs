@@ -5,6 +5,8 @@ namespace WebApplicationUser.Models
 { 
 public class ApplicationDbContext : DbContext
     {
+        //The connection is made through this class
+        //base(options)-this is what defines the connection to the database
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Operator> Operation { get; set; }

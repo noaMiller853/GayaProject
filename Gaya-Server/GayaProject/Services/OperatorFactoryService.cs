@@ -1,27 +1,19 @@
-using Azure;
 using GayaProject.Interfaces;
 
 namespace GayaProject.Services
 {
     public class OperatorFactoryService : IOperatorFactoryService
     {
-        private readonly IOperatorService _operatorService;
-        public OperatorFactoryService(IOperatorService operatorService)
+        private readonly Dictionary<string, IOperatorService> _operatorServices;
+        public OperatorFactoryService(IEnumerable<IOperatorService> services)
         {
-            _operatorService = operatorService;
+            _operatorServices = services.ToDictionary(s => s.OperatorSymbol, s => s);
         }
 
         public IOperatorService? InitializeOperatorServices(string operatorChar)
         {
-            return operatorChar switch
-            {
-                "+" => new AddOperatorService(),
-                "-" => new SubtractOperationService(),
-                "*" => new MultiplyOperationService(),
-                "/" => new DivideOperationService(),
-                _ => null
-            };
+            return _operatorServices.TryGetValue(operatorChar, out var service) ? service : null;
         }
     }
-    }
+}
 

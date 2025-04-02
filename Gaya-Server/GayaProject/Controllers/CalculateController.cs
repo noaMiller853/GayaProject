@@ -12,7 +12,7 @@ public class CalculateController : ControllerBase
     private readonly ILogger<CalculateController> _logger;
     private readonly ICalculateService _calculateService;
 
-    public CalculateController(ILogger<CalculateController> logger,ICalculateService calculateService)
+    public CalculateController(ILogger<CalculateController> logger, ICalculateService calculateService)
     {
         _logger = logger;
         _calculateService = calculateService;
@@ -28,8 +28,8 @@ public class CalculateController : ControllerBase
     }
 
     [HttpPost("Arguments")]
-       
-    public async Task<ActionResult<IEnumerable<Arguments>>> GetArguments([FromBody]OperatorRequest request)
+
+    public async Task<ActionResult<IEnumerable<Arguments>>> GetArguments([FromBody] OperatorRequest request)
     {
         var arguments = await _calculateService.GetArgumentsByOperatorId(request.IdOperator);
         if (arguments == null)
@@ -42,12 +42,14 @@ public class CalculateController : ControllerBase
     {
         Arguments arguments = new Arguments { FieldOne = request.Argument1, FieldTwo = request.Argument2 };
         var result = await _calculateService.CalculateArgumentsAsync(request.Operation, arguments);
-        if (result == null) 
+        if (result == null)
         {
             _logger.LogInformation($"Operation not found.");
-            return NotFound("Operation not found."); 
+            return NotFound("Operation not found.");
         }
         return Ok(result);
     }
-  
 }
+
+
+

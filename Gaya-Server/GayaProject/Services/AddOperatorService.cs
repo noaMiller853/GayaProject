@@ -5,9 +5,7 @@ namespace GayaProject.Services
 {
     public class AddOperatorService : IOperatorService
     {
-        public AddOperatorService()
-        {
-        }
+        public string OperatorSymbol => "+";
         public string Calculate(Arguments arguments)
         {
             if (!int.TryParse(arguments.FieldOne, out int a) || !int.TryParse(arguments.FieldTwo, out int b))
@@ -16,6 +14,5 @@ namespace GayaProject.Services
             }
             return (a + b).ToString();
         }
-
     }
 }

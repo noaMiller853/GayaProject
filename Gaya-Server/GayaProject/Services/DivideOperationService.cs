@@ -3,8 +3,9 @@ using WebApplicationUser.Models;
 
 namespace GayaProject.Services
 {
-    public class DivideOperationService : IOperatorService
+    public class DivideOperatorService : IOperatorService
     {
+        public string OperatorSymbol => "/";
         public string Calculate(Arguments arguments)
         {
             if (!int.TryParse(arguments.FieldOne, out int a) || !int.TryParse(arguments.FieldTwo, out int b))
@@ -15,3 +16,4 @@ namespace GayaProject.Services
         }
     }
 }
+

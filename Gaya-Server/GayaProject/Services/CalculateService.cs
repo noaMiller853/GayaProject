@@ -19,7 +19,6 @@ namespace GayaProject.Services
             _operatorServices = new Dictionary<string, IOperatorService>();
             _log = log;
         }
-
         private async Task EnsureOperatorsInitializedAsync()
         {
             if (!_operatorsInitialized)
@@ -36,7 +35,7 @@ namespace GayaProject.Services
                 var operations = await _calculateRepository.GetOperations();
                 foreach (var operation in operations)
                 {
-                    var operatorService = _operatorFactoryService.InitializeOperatorServices(operation.Operation);
+                    var operatorService =_operatorFactoryService.InitializeOperatorServices(operation.Operation);
                      if (operatorService != null)
                     {
                         _operatorServices[operation.Operation] = operatorService;
@@ -55,17 +54,25 @@ namespace GayaProject.Services
 
             if (!_operatorServices.ContainsKey(op))
             {
+                _log.LogError("Operator not found.");
                 return "Operator not found.";
             }
-            string result= _operatorServices[op].Calculate(arguments);
-            int id=_calculateRepository.GetOperationByOperatorAsync(op).Result.Id;
-            Arguments arguments1=new Arguments { 
-                FieldOne = arguments.FieldOne, FieldTwo = arguments.FieldTwo, Result = result, OperationId = id, DateResult = DateTime.Now.Date
+            string result = _operatorServices[op].Calculate(arguments);
+            var operation = await _calculateRepository.GetOperationByOperatorAsync(op);
+            int id = operation.Id;
+
+            Arguments arguments1 = new Arguments
+            {
+                FieldOne = arguments.FieldOne,
+                FieldTwo = arguments.FieldTwo,
+                Result = result,
+                OperationId = id,
+                DateResult = DateTime.Now.Date
             };
             await AddArgumentsAsync(arguments1);
             return result;
         }
-
+       
         public async Task<List<Operator>> GetOperationsAsync()
         {
             return await _calculateRepository.GetOperations();
@@ -84,6 +91,7 @@ namespace GayaProject.Services
         {
             return await _calculateRepository.GetCountExuteByMonth(idOperator);
         }
+        
     }
 
     

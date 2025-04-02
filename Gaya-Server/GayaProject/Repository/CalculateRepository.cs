@@ -1,3 +1,4 @@
+using System.Diagnostics.Metrics;
 using GayaProject.Interfaces;
 using GayaProject.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,9 @@ namespace GayaProject.Repository
         {
             return await _context.Operation.ToListAsync();
         }
-        public async Task<Operator> GetOperationByOperatorAsync(string op)
+        public async Task<Operator?> GetOperationByOperatorAsync(string op)
         {
-            return await _context.Operation.FirstOrDefaultAsync(o => o.Operation == op);
+            return await _context.Operation.AsNoTracking().FirstOrDefaultAsync(o => o.Operation == op);
         }
         public async Task<Operator> AddOperationAsync(Operator operation)
         {
@@ -42,24 +43,25 @@ namespace GayaProject.Repository
             await _context.SaveChangesAsync();
             return arguments;
         }
-        public async Task<Arguments> GetArgumentsAsync(int id)
+        public async Task<Arguments?> GetArgumentsAsync(int id)
         {
-            return await _context.Arguments.FindAsync(id);
+            return await _context.Arguments.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
         }
         public async Task<List<Arguments>> GetArgumentsAsyncByOperationId(int idOperator)
         {
-            return await _context.Arguments
-                .FromSqlRaw("EXEC SelectResultTop3ByOperator @Id = {0}", idOperator)
+            return await _context.Arguments.AsNoTracking()
+                .Where(a=>a.OperationId == idOperator)
+                .OrderByDescending(o=>o.DateResult)
+                .Take(3)
                 .ToListAsync();
         }
 
         public async Task<int> GetCountExuteByMonth(int idOperator)
         {
-            var result = await _context.Set<CountIdResult>()
-                .FromSqlRaw("EXEC SelectCountExcuteByDate @Id = {0}", idOperator)
-                .FirstOrDefaultAsync();
-
-            return result?.CountId ?? 0;
+            return await _context.Arguments
+                .Where(o => o.OperationId == idOperator && o.DateResult.HasValue && 
+                o.DateResult.Value.Month == DateTime.Now.Month)
+                .CountAsync(o => o.Result != null);
         }
     }
 }
